@@ -1,0 +1,91 @@
+﻿@model SistemaInventario.Modelos.Categoria
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var titulo = "Crear Categoria";
+}
+
+<!--Creamos el formulario de envio de informacion-->
+<form method="post">
+    <div style="padding-left:15%; padding-right:15%; padding-bottom:inherit.4rem;">
+        <div class="row border-0">
+            <div asp-validation-summary="ModelOnly" class="text-danger">
+            </div>
+        </div>
+        <!--Cambio de titulo de la pagina-->
+        @if (Model.id != 0)
+        {
+            //Actualizar
+            titulo = "Actualizar Categoria";
+            <input type="hidden" asp-for="id" id="id" />
+        }
+        <!--Mostramos el titulo de la pagina-->
+        <div class="col-12 border-bottom p-0">
+            <h2 class="text-primary">@titulo</h2>
+        </div>
+        <!--Campo Nombre-->
+        <div class="row mb-2 mt-2">
+            <div class="form-group col-md-6">
+                <label>Nombre</label>
+                <input type="text" asp-for="Nombre" class="form-control" placeholder="Nombre de la Categoria" id="nombre"/>
+                <span asp-validation-for="Nombre" class="text-danger" ></span>
+            </div>
+        </div>
+        <!--Campo Descripción-->
+        <div class="row mb-2 mt-2">
+            <div class="form-group col-md-6">
+                <label>Descripcion</label>
+                <input type="text" asp-for="Descripcion" class="form-control" placeholder="Descripcion de la Categoria" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+        </div>
+        <!--Campo Estado-->
+        <div class="row mb-2 mt-2">
+            <div class="form-group col-md-6">
+                <label>Estado</label>
+                <select asp-for="Estado" class="form-select">
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+        </div>
+        <!--Presentamos las vistas parciales-->
+        <br />
+        @if (Model.id != 0)
+        {
+            <partial name="_BotonesActualizarYRegresar" model="Model.id"/>
+        }else
+        {
+            <partial name="_BotonesCrearYRegresar"/>
+        }
+    </div>
+</form>
+
+<!--Configuramos por medio de un script al dom para que use los helper tags-->
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("nombre").addEventListener('change', function () {
+            ValidarNombre();
+        });
+
+        function ValidarNombre(){
+            var url = '@Url.Content("~/")'+"Admin/Categoria/ValidarNombre";
+            var id = '#id';
+            var nombre = '#nombre';
+
+            $.getJSON(url, {id:$(id).val(), nombre:$(nombre).val()}, function(data){
+                $.each(data, function (key, value) {
+                    if (value) {
+                        var nombre = document.getElementById("nombre");
+                        swal("ERROR", "Este nombre ya existe", "error");
+                        nombre.value = "";
+                    }
+                });
+            })
+        }
+    </script>
+}
+
+
+
