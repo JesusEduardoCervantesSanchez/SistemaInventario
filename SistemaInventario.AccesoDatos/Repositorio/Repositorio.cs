@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SistemaInventario.AccesoDatos.Repositorio.IRepositorio;
+using SistemaInventario.Modelos.Especificaciones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Quic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,6 +57,7 @@ namespace SistemaInventario.AccesoDatos.Repositorio
             return await query.ToListAsync();
         }
 
+
         public async Task<T> ObtenerPrimero(Expression<Func<T, bool>> filtro = null, string incluirPropiedades = null, bool isTracking = true)
         {
             IQueryable<T> query = dbSet;
@@ -85,5 +88,30 @@ namespace SistemaInventario.AccesoDatos.Repositorio
         {
             dbSet.RemoveRange(entidad);
         }
-    }
+
+		public PageList<T> ObtenerTodosPaginado(Parametros para, Expression<Func<T, bool>> filtro = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string incluirPropiedades = null, bool isTracking = true)
+		{
+			IQueryable<T> query = dbSet;
+            if(filtro != null)
+            {
+                query = query.Where(filtro);
+            }
+			if (incluirPropiedades != null)
+			{
+				foreach (var incluirProp in incluirPropiedades.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+				{
+					query = query.Include(incluirProp);
+				}
+			}
+			if (orderBy != null)
+			{
+				query = orderBy(query);
+			}
+			if (!isTracking)
+			{
+				query = query.AsNoTracking();
+			}
+            return PageList<T>.ToPagesList(query, para.pageNumber, para.pageSize);
+		}
+	}
 }

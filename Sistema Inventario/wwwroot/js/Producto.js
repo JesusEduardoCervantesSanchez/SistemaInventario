@@ -10,7 +10,7 @@
                 "url":"/Admin/Producto/ObtenerTodos"
             },
             "columns": [
-                { "data": "numero serie"},
+                { "data": "numeroSerie"},
                 { "data": "descripcion" },
                 { "data": "categoria.nombre" },
                 { "data": "marca.nombre" },
